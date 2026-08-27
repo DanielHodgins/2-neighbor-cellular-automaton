@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>2-Neighbor Cellular Automaton</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>2-Neighbor Cellular Automaton</h1>
+        <p>Exactly 2 neighbors → alive. Anything else → dead.</p>
+    </header>
+
+    <main>
+
+        <section class="controls">
+
+            <div class="control-group">
+                <label for="rows">Rows</label>
+                <input id="rows" type="number" value="20" min="1" max="100">
+            </div>
+
+            <div class="control-group">
+                <label for="cols">Columns</label>
+                <input id="cols" type="number" value="30" min="1" max="150">
+            </div>
+
+            <div class="control-group">
+                <label for="steps">Steps</label>
+                <input id="steps" type="number" value="100" min="0">
+            </div>
+
+            <div class="button-group">
+                <button id="randomBtn">New Random Grid</button>
+                <button id="clearBtn">Clear</button>
+                <button id="startBtn">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="stepBtn">Step →</button>
+                <button id="backBtn">← Back</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+
+        </section>
+
+        <section class="status">
+            <span id="generation">
+                Generation: 0 / 100
+            </span>
+
+            <span id="population">
+                Alive: 0
+            </span>
+        </section>
+
+        <section class="grid-container">
+            <canvas id="gridCanvas"></canvas>
+        </section>
+
+        <section class="help">
+
+            <h2>How to use</h2>
+
+            <ul>
+                <li>Click cells to turn them on or off.</li>
+                <li><strong>Start</strong> runs the simulation.</li>
+                <li><strong>Step</strong> advances one generation.</li>
+                <li><strong>Back</strong> goes back one generation.</li>
+                <li><strong>Reset</strong> returns to your original grid.</li>
+                <li><strong>Clear</strong> clears the current grid.</li>
+            </ul>
+
+            <p>
+                Keyboard:
+                <kbd>Space</kbd> Start/Pause
+                <kbd>←</kbd> Back
+                <kbd>→</kbd> Step
+            </p>
+
+        </section>
+
+    </main>
+
+    <footer>
+        2-Neighbor Cellular Automaton
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
