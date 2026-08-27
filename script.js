@@ -16,6 +16,11 @@ const resetBtn = document.getElementById("resetBtn");
 const generationLabel = document.getElementById("generation");
 const populationLabel = document.getElementById("population");
 
+
+// ============================================================
+// SETTINGS
+// ============================================================
+
 let rows = 20;
 let cols = 30;
 let maxSteps = 100;
@@ -34,7 +39,7 @@ const SPEED = 100;
 
 
 // ============================================================
-// Create empty grid
+// CREATE EMPTY GRID
 // ============================================================
 
 function createEmptyGrid() {
@@ -47,7 +52,7 @@ function createEmptyGrid() {
 
 
 // ============================================================
-// Create random grid
+// CREATE RANDOM GRID
 // ============================================================
 
 function createRandomGrid() {
@@ -64,7 +69,7 @@ function createRandomGrid() {
 
 
 // ============================================================
-// Copy grid
+// COPY GRID
 // ============================================================
 
 function copyGrid(source) {
@@ -74,7 +79,7 @@ function copyGrid(source) {
 
 
 // ============================================================
-// Count neighbors
+// COUNT NEIGHBORS
 // ============================================================
 
 function countNeighbors(row, col) {
@@ -85,6 +90,7 @@ function countNeighbors(row, col) {
 
         for (let dc = -1; dc <= 1; dc++) {
 
+            // Don't count the cell itself
             if (dr === 0 && dc === 0) {
                 continue;
             }
@@ -92,12 +98,14 @@ function countNeighbors(row, col) {
             const r = row + dr;
             const c = col + dc;
 
+            // Make sure we're inside the grid
             if (
                 r >= 0 &&
                 r < rows &&
                 c >= 0 &&
                 c < cols
             ) {
+
                 count += grid[r][c];
             }
         }
@@ -108,7 +116,7 @@ function countNeighbors(row, col) {
 
 
 // ============================================================
-// Calculate next generation
+// CALCULATE NEXT GENERATION
 // ============================================================
 
 function nextGeneration() {
@@ -121,12 +129,12 @@ function nextGeneration() {
 
             const neighbors = countNeighbors(r, c);
 
-            // ================================================
+            // =================================================
             // YOUR RULE
             //
             // Exactly 2 neighbors = ALIVE
             // Anything else = DEAD
-            // ================================================
+            // =================================================
 
             if (neighbors === 2) {
                 newGrid[r][c] = 1;
@@ -139,7 +147,7 @@ function nextGeneration() {
 
 
 // ============================================================
-// Draw grid
+// DRAW GRID
 // ============================================================
 
 function drawGrid() {
@@ -151,69 +159,200 @@ function drawGrid() {
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
 
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
 
     const width = rect.width;
     const height = rect.height;
 
-    const cellWidth = width / cols;
-    const cellHeight = height / rows;
 
-    ctx.clearRect(0, 0, width, height);
+    // ========================================================
+    // SQUARE CELLS
+    // ========================================================
 
-    // Background
+    const cellSize = Math.min(
+        width / cols,
+        height / rows
+    );
+
+    const gridWidth = cellSize * cols;
+    const gridHeight = cellSize * rows;
+
+
+    // Center grid
+    const offsetX =
+        (width - gridWidth) / 2;
+
+    const offsetY =
+        (height - gridHeight) / 2;
+
+
+    // ========================================================
+    // BACKGROUND
+    // ========================================================
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, width, height);
 
-    // Cells
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    // ========================================================
+    // DRAW CELLS
+    // ========================================================
+
     for (let r = 0; r < rows; r++) {
 
         for (let c = 0; c < cols; c++) {
 
+            const x =
+                offsetX + c * cellSize;
+
+            const y =
+                offsetY + r * cellSize;
+
+
+            // ------------------------------------------------
+            // ALIVE
+            // ------------------------------------------------
+
             if (grid[r][c] === 1) {
 
                 ctx.fillStyle = "black";
-
-                ctx.fillRect(
-                    c * cellWidth,
-                    r * cellHeight,
-                    cellWidth,
-                    cellHeight
-                );
             }
+
+
+            // ------------------------------------------------
+            // DEAD
+            // ------------------------------------------------
+
+            else {
+
+                let justDied = false;
+
+                /*
+                 * history contains the previous generations.
+                 *
+                 * The most recent generation is:
+                 *
+                 * history[history.length - 1]
+                 */
+
+                if (history.length > 0) {
+
+                    const previousGrid =
+                        history[history.length - 1];
+
+                    if (previousGrid[r][c] === 1) {
+
+                        justDied = true;
+                    }
+                }
+
+
+                // Just died
+                if (justDied) {
+
+                    ctx.fillStyle = "#b0b0b0";
+                }
+
+                // Already dead
+                else {
+
+                    ctx.fillStyle = "white";
+                }
+            }
+
+
+            // Draw square
+            ctx.fillRect(
+                x,
+                y,
+                cellSize,
+                cellSize
+            );
         }
     }
 
-    // Grid lines
+
+    // ========================================================
+    // GRID LINES
+    // ========================================================
+
     ctx.strokeStyle = "#cccccc";
     ctx.lineWidth = 1;
 
+
+    // Horizontal lines
+
     for (let r = 0; r <= rows; r++) {
 
-        const y = r * cellHeight;
+        const y =
+            offsetY + r * cellSize;
 
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
+
+        ctx.moveTo(
+            offsetX,
+            y
+        );
+
+        ctx.lineTo(
+            offsetX + gridWidth,
+            y
+        );
+
         ctx.stroke();
     }
+
+
+    // Vertical lines
 
     for (let c = 0; c <= cols; c++) {
 
-        const x = c * cellWidth;
+        const x =
+            offsetX + c * cellSize;
 
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
+
+        ctx.moveTo(
+            x,
+            offsetY
+        );
+
+        ctx.lineTo(
+            x,
+            offsetY + gridHeight
+        );
+
         ctx.stroke();
     }
 
+
+    // Update information
     updateStatus();
 }
 
 
 // ============================================================
-// Update status
+// UPDATE STATUS
 // ============================================================
 
 function updateStatus() {
@@ -237,31 +376,52 @@ function updateStatus() {
 
 
 // ============================================================
-// New random grid
+// NEW RANDOM GRID
 // ============================================================
 
 function newRandomGrid() {
 
     pause();
 
-    rows = Math.max(1, parseInt(rowsInput.value) || 20);
-    cols = Math.max(1, parseInt(colsInput.value) || 30);
-    maxSteps = Math.max(0, parseInt(stepsInput.value) || 100);
 
+    rows = Math.max(
+        1,
+        parseInt(rowsInput.value) || 20
+    );
+
+    cols = Math.max(
+        1,
+        parseInt(colsInput.value) || 30
+    );
+
+    maxSteps = Math.max(
+        0,
+        parseInt(stepsInput.value) || 100
+    );
+
+
+    // Generate random grid
     grid = createRandomGrid();
 
+
+    // Save starting grid
     startingGrid = copyGrid(grid);
 
+
+    // Clear history
     history = [];
 
+
+    // Reset generation
     generation = 0;
+
 
     drawGrid();
 }
 
 
 // ============================================================
-// Clear
+// CLEAR
 // ============================================================
 
 function clearGrid() {
@@ -279,13 +439,14 @@ function clearGrid() {
 
 
 // ============================================================
-// Reset
+// RESET
 // ============================================================
 
 function reset() {
 
     pause();
 
+    // Restore original starting grid
     grid = copyGrid(startingGrid);
 
     history = [];
@@ -297,54 +458,71 @@ function reset() {
 
 
 // ============================================================
-// Step forward
+// STEP FORWARD
 // ============================================================
 
 function stepForward() {
 
     if (generation >= maxSteps) {
+
         pause();
+
         return;
     }
 
-    // Save current generation
-    history.push(copyGrid(grid));
 
+    // Save current generation
+    history.push(
+        copyGrid(grid)
+    );
+
+
+    // Calculate next generation
     nextGeneration();
 
+
     generation++;
+
 
     drawGrid();
 }
 
 
 // ============================================================
-// Step backward
+// STEP BACKWARD
 // ============================================================
 
 function stepBackward() {
 
     pause();
 
+
+    // Nothing to go back to
     if (history.length === 0) {
+
         return;
     }
 
+
+    // Restore previous generation
     grid = history.pop();
 
+
     generation--;
+
 
     drawGrid();
 }
 
 
 // ============================================================
-// Start
+// START
 // ============================================================
 
 function start() {
 
     if (running) {
+
         return;
     }
 
@@ -355,14 +533,16 @@ function start() {
 
 
 // ============================================================
-// Simulation loop
+// RUN SIMULATION
 // ============================================================
 
 function runSimulation() {
 
     if (!running) {
+
         return;
     }
+
 
     if (generation >= maxSteps) {
 
@@ -371,7 +551,9 @@ function runSimulation() {
         return;
     }
 
+
     stepForward();
+
 
     animationId = setTimeout(
         runSimulation,
@@ -381,12 +563,13 @@ function runSimulation() {
 
 
 // ============================================================
-// Pause
+// PAUSE
 // ============================================================
 
 function pause() {
 
     running = false;
+
 
     if (animationId !== null) {
 
@@ -398,41 +581,94 @@ function pause() {
 
 
 // ============================================================
-// Click canvas
+// CLICK CELLS
 // ============================================================
 
-canvas.addEventListener("click", function(event) {
+canvas.addEventListener(
+    "click",
+    function(event) {
 
-    const rect = canvas.getBoundingClientRect();
+        const rect =
+            canvas.getBoundingClientRect();
 
-    const cellWidth = rect.width / cols;
-    const cellHeight = rect.height / rows;
+        const width = rect.width;
+        const height = rect.height;
 
-    const col = Math.floor(
-        (event.clientX - rect.left) / cellWidth
-    );
 
-    const row = Math.floor(
-        (event.clientY - rect.top) / cellHeight
-    );
+        // Same square cell calculation
+        const cellSize = Math.min(
+            width / cols,
+            height / rows
+        );
 
-    if (
-        row >= 0 &&
-        row < rows &&
-        col >= 0 &&
-        col < cols
-    ) {
 
-        grid[row][col] =
-            grid[row][col] === 1 ? 0 : 1;
+        // Size of grid
+        const gridWidth =
+            cellSize * cols;
 
-        drawGrid();
+        const gridHeight =
+            cellSize * rows;
+
+
+        // Centered grid
+        const offsetX =
+            (width - gridWidth) / 2;
+
+        const offsetY =
+            (height - gridHeight) / 2;
+
+
+        // Mouse position
+        const mouseX =
+            event.clientX - rect.left;
+
+        const mouseY =
+            event.clientY - rect.top;
+
+
+        // Ignore clicks outside grid
+        if (
+            mouseX < offsetX ||
+            mouseX >= offsetX + gridWidth ||
+            mouseY < offsetY ||
+            mouseY >= offsetY + gridHeight
+        ) {
+
+            return;
+        }
+
+
+        // Determine cell
+        const col = Math.floor(
+            (mouseX - offsetX) / cellSize
+        );
+
+        const row = Math.floor(
+            (mouseY - offsetY) / cellSize
+        );
+
+
+        if (
+            row >= 0 &&
+            row < rows &&
+            col >= 0 &&
+            col < cols
+        ) {
+
+            grid[row][col] =
+                grid[row][col] === 1
+                    ? 0
+                    : 1;
+
+
+            drawGrid();
+        }
     }
-});
+);
 
 
 // ============================================================
-// Button events
+// BUTTONS
 // ============================================================
 
 randomBtn.addEventListener(
@@ -472,24 +708,30 @@ resetBtn.addEventListener(
 
 
 // ============================================================
-// Keyboard controls
+// KEYBOARD CONTROLS
 // ============================================================
 
 document.addEventListener(
     "keydown",
     function(event) {
 
+        // Space = Start/Pause
         if (event.code === "Space") {
 
             event.preventDefault();
 
             if (running) {
+
                 pause();
+
             } else {
+
                 start();
             }
         }
 
+
+        // Right Arrow = Forward
         if (event.key === "ArrowRight") {
 
             event.preventDefault();
@@ -497,6 +739,8 @@ document.addEventListener(
             stepForward();
         }
 
+
+        // Left Arrow = Back
         if (event.key === "ArrowLeft") {
 
             event.preventDefault();
@@ -508,7 +752,7 @@ document.addEventListener(
 
 
 // ============================================================
-// Resize
+// WINDOW RESIZE
 // ============================================================
 
 window.addEventListener(
@@ -518,7 +762,7 @@ window.addEventListener(
 
 
 // ============================================================
-// Start
+// START APPLICATION
 // ============================================================
 
 newRandomGrid();
