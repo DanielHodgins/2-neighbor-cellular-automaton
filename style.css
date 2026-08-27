@@ -1,0 +1,173 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid #333;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+header p {
+    margin: 0;
+    color: #aaa;
+}
+
+main {
+    width: 100%;
+    max-width: 1600px;
+    margin: auto;
+    padding: 20px;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.control-group label {
+    font-size: 13px;
+    color: #aaa;
+}
+
+input {
+    width: 90px;
+    padding: 9px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #222;
+    color: white;
+    font-size: 15px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+button {
+    padding: 9px 14px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background: #222;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background: #333;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.status {
+    display: flex;
+    gap: 30px;
+    padding: 10px 0;
+    color: #aaa;
+}
+
+.grid-container {
+    width: 100%;
+    height: 65vh;
+    min-height: 400px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #333;
+}
+
+#gridCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+}
+
+.help {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #181818;
+}
+
+.help h2 {
+    margin-top: 0;
+}
+
+.help li {
+    margin-bottom: 7px;
+}
+
+kbd {
+    padding: 3px 7px;
+    margin: 0 3px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #222;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+@media (max-width: 700px) {
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .grid-container {
+        height: 60vh;
+    }
+}
